@@ -45,7 +45,7 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
  *
  * This particular OpMode executes a basic Tank Drive Teleop for a PushBot
  * It raises and lowers the claw using the Gampad Y and A buttons respectively.
- * It also opens and closes the claws slowly using the left and right Bumper buttons.
+ * It also opens and closed the claws slowly using the left and right Bumper buttons.
  *
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
@@ -55,7 +55,8 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 @Disabled
 public class HelloGithub extends OpMode{
 
-    /* Declare OpMode members. */
+    // JACOB WUZ HEAR
+
     HardwarePushbot robot       = new HardwarePushbot(); // use the class created to define a Pushbot's hardware
     double          clawOffset  = 0.0 ;                  // Servo mid position
     final double    CLAW_SPEED  = 0.02 ;                 // sets rate to move servo
