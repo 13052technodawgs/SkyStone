@@ -44,12 +44,9 @@ public class HolonomicDriveTeleop extends OpMode{
     int[] yMult = {-1,1,-1,1};
     int rotMult = -1;
 
-    //TODO: replace HardwarePushbot with HardwareTechnoDawg
 
     /* Declare OpMode members. */
-    HardwarePushbot robot       = new HardwarePushbot(); // use the class created to define a Pushbot's hardware
-    double          clawOffset  = 0.0 ;                  // Servo mid position
-    final double    CLAW_SPEED  = 0.02 ;                 // sets rate to move servo
+    HardwareTechnoDawgs robot       = new HardwareTechnoDawgs(); // use the class created to define a Pushbot's hardware
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -106,12 +103,10 @@ public class HolonomicDriveTeleop extends OpMode{
         bl = x*xMult[2] + y*yMult[2] + rot*rotMult;
         br = x*xMult[3] + y*yMult[3] + rot*rotMult;
 
-
-        //TODO: output motor power
-//        robot.leftDrive.setPower(left);
-//        robot.rightDrive.setPower(right);
-
-        //TODO: send controller values to telemetry, maybe robot speed?
+        robot.frontLeft.setPower(fl);
+        robot.frontRight.setPower(fr);
+        robot.backLeft.setPower(bl);
+        robot.backRight.setPower(br);
 
         // Send telemetry message to signify robot running;
         telemetry.addData("x",  "%.2f", x);
