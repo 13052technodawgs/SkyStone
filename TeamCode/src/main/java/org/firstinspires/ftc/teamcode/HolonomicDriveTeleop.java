@@ -38,9 +38,13 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 @TeleOp(name="Holonomic Drive", group="Pushbot")
 public class HolonomicDriveTeleop extends OpMode{
-    int[] xMult = {};
-    int[] yMult = {};
+
+    // fl,fr,bl,br
+    int[] xMult = {-1,-1,1,1};
+    int[] yMult = {-1,1,-1,1};
     int rotMult = -1;
+
+    //TODO: replace HardwarePushbot with HardwareTechnoDawg
 
     /* Declare OpMode members. */
     HardwarePushbot robot       = new HardwarePushbot(); // use the class created to define a Pushbot's hardware
@@ -80,25 +84,39 @@ public class HolonomicDriveTeleop extends OpMode{
      */
     @Override
     public void loop() {
+        // INPUT
+        double x;
+        double y;
+        double rot;
 
-        //TODO: replace with x, y, and rot, and fl, fr, bl, br
-        double left;
-        double right;
+        double fl;
+        double fr;
+        double bl;
+        double br;
+
 
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
-        left = -gamepad1.left_stick_y;
-        right = -gamepad1.right_stick_y;
+        x = gamepad1.left_stick_x;
+        y = -gamepad1.left_stick_y;
+        rot = gamepad1.right_stick_x;
 
-        //TODO: calculate fl, fr, bl, br powers
+        //OUTPUT
+        fl = x*xMult[0] + y*yMult[0] + rot*rotMult;
+        fr = x*xMult[1] + y*yMult[1] + rot*rotMult;
+        bl = x*xMult[2] + y*yMult[2] + rot*rotMult;
+        br = x*xMult[3] + y*yMult[3] + rot*rotMult;
 
-        robot.leftDrive.setPower(left);
-        robot.rightDrive.setPower(right);
+
+        //TODO: output motor power
+//        robot.leftDrive.setPower(left);
+//        robot.rightDrive.setPower(right);
 
         //TODO: send controller values to telemetry, maybe robot speed?
 
         // Send telemetry message to signify robot running;
-        telemetry.addData("left",  "%.2f", left);
-        telemetry.addData("right", "%.2f", right);
+        telemetry.addData("x",  "%.2f", x);
+        telemetry.addData("y", "%.2f", y);
+        telemetry.addData("rot", "%.2f", rot);
     }
 
     /*
