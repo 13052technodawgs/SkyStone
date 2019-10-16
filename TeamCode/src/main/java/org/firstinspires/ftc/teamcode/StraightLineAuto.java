@@ -69,14 +69,25 @@ public class StraightLineAuto extends LinearOpMode {
          */
         robot.init(hardwareMap);
 
-        //TODO: Calibrate everything
-
         // Wait for the game to start (Display Gyro value), and reset gyro before we move..
         while (!isStarted()) {
 
         }
 
-        //TODO: Drive Forward
+        while(!isStopRequested()&&opModeIsActive()){
+            correction = checkDirection();
+
+            robot.frontLeft.setPower(power-correction);
+            robot.frontRight.setPower(power+correction);
+            robot.backLeft.setPower(power-correction);
+            robot.backRight.setPower(power+correction);
+
+        }
+
+        robot.frontLeft.setPower(0);
+        robot.frontRight.setPower(0);
+        robot.backLeft.setPower(0);
+        robot.backRight.setPower(0);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
