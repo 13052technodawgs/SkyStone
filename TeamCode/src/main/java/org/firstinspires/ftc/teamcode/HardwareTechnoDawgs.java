@@ -56,6 +56,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  */
 public class HardwareTechnoDawgs
 {
+    //TODO: add IMU
+
     /* Public OpMode members. */
     public DcMotor frontLeft = null;
     public DcMotor frontRight = null;
