@@ -29,6 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -54,8 +55,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Motor: backLeft
  * Motor: backRight
  */
-public class HardwareTechnoDawgs
-{
+public class HardwareTechnoDawgs {
     //TODO: add IMU
 
     /* Public OpMode members. */
@@ -63,13 +63,18 @@ public class HardwareTechnoDawgs
     public DcMotor frontRight = null;
     public DcMotor backLeft = null;
     public DcMotor backRight = null;
+    //HERE
+    public BNO055IMU imu;
+
+    BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+
 
     /* local OpMode members. */
-    HardwareMap hwMap           =  null;
-    private ElapsedTime period  = new ElapsedTime();
+    HardwareMap hwMap = null;
+    private ElapsedTime period = new ElapsedTime();
 
     /* Constructor */
-    public HardwareTechnoDawgs(){
+    public HardwareTechnoDawgs() {
 
     }
 
@@ -98,6 +103,22 @@ public class HardwareTechnoDawgs
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        // HERE Pt 2
+        // Retrieve and initialize the IMU. We expect the IMU to be attached to
+        // an I2C port
+        // on a Core Device Interface Module, configured to be a sensor of type
+        // "AdaFruit IMU",
+        // and named "imu".
+        imu = hwMap.get(BNO055IMU.class, "imu");
+
+        imu.initialize(parameters);
+
+                // make sure the imu gyro is calibrated before continuing.
+        while (!imu.isGyroCalibrated()) {
+
+        }
     }
- }
+}
 
