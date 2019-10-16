@@ -77,9 +77,9 @@ public class StraightLineAuto extends LinearOpMode {
         while(!isStopRequested()&&opModeIsActive()){
             correction = checkDirection();
 
-            robot.frontLeft.setPower(power-correction);
+            robot.frontLeft.setPower(-power+correction);
             robot.frontRight.setPower(power+correction);
-            robot.backLeft.setPower(power-correction);
+            robot.backLeft.setPower(-power+correction);
             robot.backRight.setPower(power+correction);
 
         }
