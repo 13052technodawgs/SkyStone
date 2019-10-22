@@ -74,20 +74,16 @@ public class StraightLineAuto extends LinearOpMode {
 
         }
 
-        while(!isStopRequested()&&opModeIsActive()){
-            correction = checkDirection();
+        goForward(7200.0);
 
-            robot.frontLeft.setPower(-power+correction);
-            robot.frontRight.setPower(power+correction);
-            robot.backLeft.setPower(-power+correction);
-            robot.backRight.setPower(power+correction);
-
+        while(opModeIsActive() && !isStopRequested()){
+            robot.frontLeft.setPower(1);
+            robot.frontRight.setPower(1);
+            robot.backLeft.setPower(1);
+            robot.backRight.setPower(1);
         }
 
-        robot.frontLeft.setPower(0);
-        robot.frontRight.setPower(0);
-        robot.backLeft.setPower(0);
-        robot.backRight.setPower(0);
+       robot.stop( );
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -95,6 +91,34 @@ public class StraightLineAuto extends LinearOpMode {
 
     // METHODS HERE
 //METHODS
+    /**
+     * go forward with gyro correction
+     * 2240 pulses per rotation of output shaft
+     *
+     * @param angle wheel rotation angle in degrees
+     */
+    private void goForward(double angle){
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int pulses = -(int)((angle/360.0)*2240);
+
+        robot.frontLeft.setTargetPosition(pulses);
+
+        while(opModeIsActive() && robot.frontLeft.isBusy()) {
+            correction = checkDirection();
+
+            robot.frontLeft.setPower(-power + correction);
+            robot.frontRight.setPower(power + correction);
+            robot.backLeft.setPower(-power + correction);
+            robot.backRight.setPower(power + correction);
+        }
+        robot.stop( );
+
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+    }
     /**
      * Get current cumulative angle rotation from last reset.
      * @return Angle in degrees. + = left, - = right.

@@ -119,5 +119,6 @@ public class HolonomicDriveTeleop extends OpMode{
      */
     @Override
     public void stop() {
+        robot.stop();
     }
 }
