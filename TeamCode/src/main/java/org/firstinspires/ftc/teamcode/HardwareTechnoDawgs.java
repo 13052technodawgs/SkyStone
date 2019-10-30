@@ -32,6 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -56,13 +57,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Motor: backRight
  */
 public class HardwareTechnoDawgs {
-    //TODO: add IMU
 
     /* Public OpMode members. */
     public DcMotor frontLeft = null;
     public DcMotor frontRight = null;
     public DcMotor backLeft = null;
     public DcMotor backRight = null;
+
+    public DcMotor armMotor = null;
+
+    public Servo frontServo = null;
+    //TODO: implement servos
+
     //HERE
     public BNO055IMU imu;
 
@@ -88,6 +94,12 @@ public class HardwareTechnoDawgs {
         frontRight = hwMap.get(DcMotor.class, "frontRight");
         backLeft = hwMap.get(DcMotor.class, "backLeft");
         backRight = hwMap.get(DcMotor.class, "backRight");
+
+        try {
+            armMotor = hwMap.get(DcMotor.class, "armMotor");
+        }catch(Exception e){
+            // Do nothing for now
+        }
 //        frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
 //        frontRight.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
@@ -97,12 +109,16 @@ public class HardwareTechnoDawgs {
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 
         // HERE Pt 2

@@ -39,6 +39,8 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 @TeleOp(name="Holonomic Drive", group="Pushbot")
 public class HolonomicDriveTeleop extends OpMode{
 
+    //TODO: write arm code
+
     // fl,fr,bl,br
     int[] xMult = {-1,-1,1,1};
     int[] yMult = {-1,1,-1,1};
