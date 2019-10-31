@@ -118,6 +118,7 @@ public class HardwareTechnoDawgs {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        //TODO: Maybe run to position
         armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
 

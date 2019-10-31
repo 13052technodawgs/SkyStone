@@ -99,11 +99,17 @@ public class HolonomicDriveTeleop extends OpMode{
         y = -gamepad1.left_stick_y;
         rot = gamepad1.right_stick_x;
 
+        //TODO: Get second controller input for arm
+        // Right Trigger is grab, left thumbstick is position
+
         //OUTPUT
         fl = x*xMult[0] + y*yMult[0] + rot*rotMult;
         fr = x*xMult[1] + y*yMult[1] + rot*rotMult;
         bl = x*xMult[2] + y*yMult[2] + rot*rotMult;
         br = x*xMult[3] + y*yMult[3] + rot*rotMult;
+
+        //TODO: calculate arm direction and speed, run to that position
+        //TODO: Set servo position
 
         robot.frontLeft.setPower(fl);
         robot.frontRight.setPower(fr);
