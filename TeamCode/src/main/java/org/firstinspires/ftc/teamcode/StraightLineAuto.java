@@ -50,7 +50,6 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 //@Disabled
 public class StraightLineAuto extends LinearOpMode {
 
-    // TODO: Replace Pushbot with HardwareTechnoDawgs
     /* Declare OpMode members. */
     HardwareTechnoDawgs         robot   = new HardwareTechnoDawgs();   // Use a Pushbot's hardware
     ModernRoboticsI2cGyro   gyro    = null;                    // Additional Gyro device

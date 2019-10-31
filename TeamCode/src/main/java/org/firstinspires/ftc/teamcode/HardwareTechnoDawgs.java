@@ -67,6 +67,7 @@ public class HardwareTechnoDawgs {
     public DcMotor armMotor = null;
 
     public Servo frontServo = null;
+    public Servo backServo = null;
     //TODO: implement servos
 
     //HERE
@@ -100,6 +101,9 @@ public class HardwareTechnoDawgs {
         }catch(Exception e){
             // Do nothing for now
         }
+
+        frontServo = hwMap.get(Servo.class,"frontServo");
+        backServo = hwMap.get(Servo.class,"backServo");
 //        frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
 //        frontRight.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
@@ -118,8 +122,7 @@ public class HardwareTechnoDawgs {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        //TODO: Maybe run to position
-        armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
         // HERE Pt 2

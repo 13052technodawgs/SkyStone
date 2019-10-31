@@ -46,6 +46,8 @@ public class HolonomicDriveTeleop extends OpMode{
     int[] yMult = {-1,1,-1,1};
     int rotMult = -1;
 
+    int lastArmPos;
+
 
     /* Declare OpMode members. */
     HardwareTechnoDawgs robot       = new HardwareTechnoDawgs(); // use the class created to define a Pushbot's hardware
@@ -76,6 +78,9 @@ public class HolonomicDriveTeleop extends OpMode{
      */
     @Override
     public void start() {
+
+        lastArmPos = 0;
+        //TODO: Zero the arm sensor
     }
 
     /*
@@ -93,6 +98,10 @@ public class HolonomicDriveTeleop extends OpMode{
         double bl;
         double br;
 
+        double armPos;
+        int grabberPos;
+
+
 
         // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
         x = gamepad1.left_stick_x;
@@ -101,6 +110,9 @@ public class HolonomicDriveTeleop extends OpMode{
 
         //TODO: Get second controller input for arm
         // Right Trigger is grab, left thumbstick is position
+        armPos = gamepad2.left_stick_y;
+        grabberPos = gamepad2.right_trigger>0.5? 1: -1; //IMPORTANT===========================================
+
 
         //OUTPUT
         fl = x*xMult[0] + y*yMult[0] + rot*rotMult;
@@ -110,16 +122,34 @@ public class HolonomicDriveTeleop extends OpMode{
 
         //TODO: calculate arm direction and speed, run to that position
         //TODO: Set servo position
+        //1120 ticks = 180 motor degrees
+        //Gear reduction 1:6
+        //6720 ticks = 180 arm degrees
+
+        armPos += 1; //scale from -1 to 1 -> 0 to 2
+        armPos *= 6720/2;
+
+        double armPower = armPos>lastArmPos? -0.3: 0.3;
+
+        robot.armMotor.setTargetPosition((int)armPos);
+        robot.armMotor.setPower(armPower);
 
         robot.frontLeft.setPower(fl);
         robot.frontRight.setPower(fr);
         robot.backLeft.setPower(bl);
         robot.backRight.setPower(br);
 
+        // get the robot's front servo and set its position to grabberPos
+        // Do the same with the backServo
+        robot.frontServo.setPosition(grabberPos);
+        robot.backServo.setPosition(grabberPos);
+
         // Send telemetry message to signify robot running;
         telemetry.addData("x",  "%.2f", x);
         telemetry.addData("y", "%.2f", y);
         telemetry.addData("rot", "%.2f", rot);
+
+        lastArmPos = (int)armPos;
     }
 
     /*
