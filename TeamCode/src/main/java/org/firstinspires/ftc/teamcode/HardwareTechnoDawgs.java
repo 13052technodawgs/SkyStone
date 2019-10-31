@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -102,6 +103,8 @@ public class HardwareTechnoDawgs {
             // Do nothing for now
         }
 
+        armMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
         frontServo = hwMap.get(Servo.class,"frontServo");
         backServo = hwMap.get(Servo.class,"backServo");
 //        frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
@@ -122,6 +125,8 @@ public class HardwareTechnoDawgs {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        armMotor.setTargetPosition(0);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
 
@@ -147,6 +152,7 @@ public class HardwareTechnoDawgs {
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
+        armMotor.setPower(0);
     }
 }
 

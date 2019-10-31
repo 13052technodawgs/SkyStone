@@ -122,9 +122,9 @@ public class HolonomicDriveTeleop extends OpMode{
         //6720 ticks = 180 arm degrees
 
         armPos += 1; //scale from -1 to 1 -> 0 to 2
-        armPos *= 6720/2;
+        armPos *= 1120*6/2;
 
-        double armPower = armPos>robot.armMotor.getCurrentPosition()? -0.3: 0.3;
+        double armPower = armPos>robot.armMotor.getCurrentPosition()? -0.6: 0.6;
 
         robot.armMotor.setTargetPosition((int)armPos);
         robot.armMotor.setPower(armPower);
@@ -137,13 +137,18 @@ public class HolonomicDriveTeleop extends OpMode{
         // get the robot's front servo and set its position to grabberPos
         // Do the same with the backServo
         robot.frontServo.setPosition(grabberPos);
-        robot.backServo.setPosition(grabberPos);
+        robot.backServo.setPosition(-grabberPos);
 
         // Send telemetry message to signify robot running;
         telemetry.addData("x",  "%.2f", x);
         telemetry.addData("y", "%.2f", y);
         telemetry.addData("rot", "%.2f", rot);
-
+        telemetry.addData("armGoal", "%.2f", armPos);
+        try {
+            telemetry.addData("armPosition", "%d", robot.armMotor.getCurrentPosition());
+        } catch (Exception e) {
+            //doNada
+        }
     }
 
     /*
