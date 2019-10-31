@@ -39,14 +39,10 @@ import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 @TeleOp(name="Holonomic Drive", group="Pushbot")
 public class HolonomicDriveTeleop extends OpMode{
 
-    //TODO: write arm code
-
     // fl,fr,bl,br
     int[] xMult = {-1,-1,1,1};
     int[] yMult = {-1,1,-1,1};
     int rotMult = -1;
-
-    int lastArmPos;
 
 
     /* Declare OpMode members. */
@@ -79,7 +75,6 @@ public class HolonomicDriveTeleop extends OpMode{
     @Override
     public void start() {
 
-        lastArmPos = 0;
         //TODO: Zero the arm sensor
     }
 
@@ -129,7 +124,7 @@ public class HolonomicDriveTeleop extends OpMode{
         armPos += 1; //scale from -1 to 1 -> 0 to 2
         armPos *= 6720/2;
 
-        double armPower = armPos>lastArmPos? -0.3: 0.3;
+        double armPower = armPos>robot.armMotor.getCurrentPosition()? -0.3: 0.3;
 
         robot.armMotor.setTargetPosition((int)armPos);
         robot.armMotor.setPower(armPower);
@@ -149,7 +144,6 @@ public class HolonomicDriveTeleop extends OpMode{
         telemetry.addData("y", "%.2f", y);
         telemetry.addData("rot", "%.2f", rot);
 
-        lastArmPos = (int)armPos;
     }
 
     /*
