@@ -103,16 +103,16 @@ public class HolonomicDriveTeleop extends OpMode{
         y = -gamepad1.left_stick_y;
         rot = gamepad1.right_stick_x;
 
+        x*=Math.abs(x);
+        y*=Math.abs(y);
+        rot*=Math.abs(rot);
+
         //TODO: Get second controller input for arm
         // Right Trigger is grab, left thumbstick is position
         armPos = gamepad2.left_stick_y;
         grabberPos = gamepad2.right_trigger>0.5? 1: -1; //IMPORTANT===========================================
 
-        if(armPos>0){
-            armPos*=2*(1.0/3.0);
-        }else{
-            armPos*=2*(2.0/3.0);
-        }
+
 
         //OUTPUT
         fl = x*xMult[0] + y*yMult[0] + rot*rotMult;
@@ -126,18 +126,27 @@ public class HolonomicDriveTeleop extends OpMode{
         //Gear reduction 1:6
         //6720 ticks = 180 arm degrees
 
+        //TODO: scale from -1 to 0 to 1 -> 0 to 1.5 to 2
+
         armPos += 1; //scale from -1 to 1 -> 0 to 2
-        armPos *= 1120*6/3;
+
+        if(armPos>1){
+            armPos*=2*(1.0/4.0)+(4.0/4.0);
+        }else{
+            armPos*=2*(3.0/4.0);
+        }
+
+        armPos *= 1120*6/4;
 
         double armPower = armPos>robot.armMotor.getCurrentPosition()? -0.6: 0.6;
 
         robot.armMotor.setTargetPosition((int)armPos);
         robot.armMotor.setPower(armPower);
 
-        robot.frontLeft.setPower(fl*fl);
-        robot.frontRight.setPower(fr*fr);
-        robot.backLeft.setPower(bl*bl);
-        robot.backRight.setPower(br*br);
+        robot.frontLeft.setPower(fl);
+        robot.frontRight.setPower(fr);
+        robot.backLeft.setPower(bl);
+        robot.backRight.setPower(br);
 
         // get the robot's front servo and set its position to grabberPos
         // Do the same with the backServo
