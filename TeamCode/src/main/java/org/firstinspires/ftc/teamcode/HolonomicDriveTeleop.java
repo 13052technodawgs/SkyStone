@@ -44,6 +44,9 @@ public class HolonomicDriveTeleop extends OpMode{
     int[] yMult = {-1,1,-1,1};
     int rotMult = -1;
 
+    boolean grabberLock = false;
+    boolean lastX = false;
+
 
     /* Declare OpMode members. */
     HardwareTechnoDawgs robot       = new HardwareTechnoDawgs(); // use the class created to define a Pushbot's hardware
@@ -102,6 +105,15 @@ public class HolonomicDriveTeleop extends OpMode{
         x = gamepad1.left_stick_x;
         y = -gamepad1.left_stick_y;
         rot = gamepad1.right_stick_x;
+        boolean buttonX = gamepad2.x;
+
+        if(buttonX && !lastX){
+            if(gamepad2.right_trigger>0.5 && !grabberLock){
+                grabberLock = true;
+            } else if (grabberLock) {
+                grabberLock = false;
+            }
+        }
 
         x*=Math.abs(x);
         y*=Math.abs(y);
@@ -110,7 +122,9 @@ public class HolonomicDriveTeleop extends OpMode{
         //TODO: Get second controller input for arm
         // Right Trigger is grab, left thumbstick is position
         armPos = gamepad2.left_stick_y;
-        grabberPos = gamepad2.right_trigger>0.5? 1: -1; //IMPORTANT===========================================
+
+
+        grabberPos = gamepad2.right_trigger>0.5 || grabberLock? 1: 0; //IMPORTANT===========================================
 
 
 
@@ -128,15 +142,19 @@ public class HolonomicDriveTeleop extends OpMode{
 
         //TODO: scale from -1 to 0 to 1 -> 0 to 1.5 to 2
 
-        armPos += 1; //scale from -1 to 1 -> 0 to 2
+        final double restPos = 3.0/4.0;
 
-        if(armPos>1){
-            armPos*=2*(1.0/4.0)+(4.0/4.0);
+        if(armPos>0){
+            armPos*=2*(1-restPos);
         }else{
-            armPos*=2*(3.0/4.0);
+            armPos*=2*restPos;
         }
 
-        armPos *= 1120*6/4;
+        armPos += restPos*2; //scale from -1 to 1 -> 0 to 2
+
+        final double circleFraction = 0.72;
+
+        armPos *= 1120*6/2 * circleFraction;
 
         double armPower = armPos>robot.armMotor.getCurrentPosition()? -0.6: 0.6;
 
@@ -160,9 +178,15 @@ public class HolonomicDriveTeleop extends OpMode{
         telemetry.addData("armGoal", "%.2f", armPos);
         try {
             telemetry.addData("armPosition", "%d", robot.armMotor.getCurrentPosition());
+            telemetry.addData("lastX", "%b", lastX);
+            telemetry.addData("buttonX", "%b", buttonX);
+            telemetry.addData("lock", "%b", grabberLock);
+
         } catch (Exception e) {
             //doNada
         }
+
+        lastX = buttonX;
     }
 
     /*
