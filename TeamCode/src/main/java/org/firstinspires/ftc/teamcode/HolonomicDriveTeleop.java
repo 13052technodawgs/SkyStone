@@ -142,7 +142,7 @@ public class HolonomicDriveTeleop extends OpMode{
 
         //TODO: scale from -1 to 0 to 1 -> 0 to 1.5 to 2
 
-        final double restPos = 3.0/4.0;
+        final double restPos = 5.0/6.0;
 
         if(armPos>0){
             armPos*=2*(1-restPos);
