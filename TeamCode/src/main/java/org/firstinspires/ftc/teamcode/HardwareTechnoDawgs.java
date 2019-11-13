@@ -29,9 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.hardware.Sensor;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -71,6 +74,10 @@ public class HardwareTechnoDawgs {
     public Servo backServo = null;
     //TODO: implement servos
 
+    public Servo hookServo = null;
+
+    public DigitalChannel homeSensor = null;
+
     //HERE
     public BNO055IMU imu;
 
@@ -107,6 +114,10 @@ public class HardwareTechnoDawgs {
 
         frontServo = hwMap.get(Servo.class,"frontServo");
         backServo = hwMap.get(Servo.class,"backServo");
+
+        hookServo = hwMap.get(Servo.class, "hookServo");
+
+        homeSensor = hwMap.get(DigitalChannel.class, "homeSensor");
 //        frontLeft.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
 //        frontRight.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
 
@@ -128,6 +139,8 @@ public class HardwareTechnoDawgs {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         armMotor.setTargetPosition(0);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        homeSensor.setMode(DigitalChannel.Mode.INPUT);
 
 
         // HERE Pt 2

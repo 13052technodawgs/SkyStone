@@ -31,20 +31,13 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 @Autonomous(name="Pushbot: Auto Drive By Gyro", group="Pushbot")
 //@Disabled
@@ -73,14 +66,10 @@ public class StraightLineAuto extends LinearOpMode {
 
         }
 
-        goForward(7200.0);
-
-        while(opModeIsActive() && !isStopRequested()){
-            robot.frontLeft.setPower(1);
-            robot.frontRight.setPower(1);
-            robot.backLeft.setPower(1);
-            robot.backRight.setPower(1);
-        }
+        moveStraight(7200.0, RobotDirection.FORWARD);
+        moveStraight(7200.0, RobotDirection.LEFT);
+        moveStraight(7200.0, RobotDirection.BACKWARD);
+        moveStraight(7200.0, RobotDirection.RIGHT);
 
        robot.stop( );
 
@@ -96,21 +85,21 @@ public class StraightLineAuto extends LinearOpMode {
      *
      * @param angle wheel rotation angle in degrees
      */
-    private void goForward(double angle){
+    private void moveStraight(double angle, RobotDirection direction){
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        int pulses = -(int)((angle/360.0)*2240);
+        int pulses = direction.FL() * (int)((angle/360.0)*2240);
 
         robot.frontLeft.setTargetPosition(pulses);
 
         while(opModeIsActive() && robot.frontLeft.isBusy()) {
             correction = checkDirection();
 
-            robot.frontLeft.setPower(-power + correction);
-            robot.frontRight.setPower(power + correction);
-            robot.backLeft.setPower(-power + correction);
-            robot.backRight.setPower(power + correction);
+            robot.frontLeft.setPower(  direction.FL() * power + correction);
+            robot.frontRight.setPower( direction.FR() * power + correction);
+            robot.backLeft.setPower(   direction.BL() * power + correction);
+            robot.backRight.setPower(  direction.BR() * power + correction);
         }
         robot.stop( );
 

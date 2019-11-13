@@ -35,18 +35,16 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.Camera;
+import org.firstinspires.ftc.robotcore.internal.android.dex.util.ExceptionWithContext;
 
 @TeleOp(name="Holonomic Drive", group="Pushbot")
 public class HolonomicDriveTeleop extends OpMode{
 
-    // fl,fr,bl,br
-    int[] xMult = {-1,-1,1,1};
-    int[] yMult = {-1,1,-1,1};
-    int rotMult = -1;
+    final int rotMult = -1;
 
     boolean grabberLock = false;
     boolean lastX = false;
-
 
     /* Declare OpMode members. */
     HardwareTechnoDawgs robot       = new HardwareTechnoDawgs(); // use the class created to define a Pushbot's hardware
@@ -62,7 +60,14 @@ public class HolonomicDriveTeleop extends OpMode{
         robot.init(hardwareMap);
 
         // Send telemetry message to signify robot waiting;
-        telemetry.addData("Say", "Hello Driver");    //
+        if(!robot.homeSensor.getState()){
+            telemetry.addData("Home", "True");
+        }else{
+            telemetry.addData("Home", "False");
+//            throw new Error("Robot is not home! Reset to start position");
+            throw new ExceptionWithContext("Robot is not home! Reset to start position");
+        }
+        telemetry.update();
     }
 
     /*
@@ -70,6 +75,13 @@ public class HolonomicDriveTeleop extends OpMode{
      */
     @Override
     public void init_loop() {
+        if(!robot.homeSensor.getState()){
+            telemetry.addData("Home", "True");
+        }else{
+            telemetry.addData("Home", "False");
+            throw new ExceptionWithContext("Robot is not home! Reset to start position");
+        }
+        telemetry.update();
     }
 
     /*
@@ -77,6 +89,7 @@ public class HolonomicDriveTeleop extends OpMode{
      */
     @Override
     public void start() {
+
 
         //TODO: Zero the arm sensor
     }
@@ -97,16 +110,15 @@ public class HolonomicDriveTeleop extends OpMode{
         double br;
 
         double armPos;
-        int grabberPos;
+        double grabberPos;
 
 
-
-        // Run wheels in tank mode (note: The joystick goes negative when pushed forwards, so negate it)
         x = gamepad1.left_stick_x;
         y = -gamepad1.left_stick_y;
         rot = gamepad1.right_stick_x;
         boolean buttonX = gamepad2.x;
 
+        // Debounce x button and activate grabber lock
         if(buttonX && !lastX){
             if(gamepad2.right_trigger>0.5 && !grabberLock){
                 grabberLock = true;
@@ -115,24 +127,22 @@ public class HolonomicDriveTeleop extends OpMode{
             }
         }
 
+        if (gamepad2.dpad_up) robot.hookServo.setPosition(0.3);
+        if (gamepad2.dpad_down) robot.hookServo.setPosition(1);
+
+        // Square input to smooth input values
         x*=Math.abs(x);
         y*=Math.abs(y);
         rot*=Math.abs(rot);
 
-        //TODO: Get second controller input for arm
-        // Right Trigger is grab, left thumbstick is position
         armPos = gamepad2.left_stick_y;
-
-
-        grabberPos = gamepad2.right_trigger>0.5 || grabberLock? 1: 0; //IMPORTANT===========================================
-
-
+        grabberPos = gamepad2.right_trigger>0.5 || grabberLock? 1: 0.5;
 
         //OUTPUT
-        fl = x*xMult[0] + y*yMult[0] + rot*rotMult;
-        fr = x*xMult[1] + y*yMult[1] + rot*rotMult;
-        bl = x*xMult[2] + y*yMult[2] + rot*rotMult;
-        br = x*xMult[3] + y*yMult[3] + rot*rotMult;
+        fl = x*RobotDirection.RIGHT.FL() + y*RobotDirection.FORWARD.FL() + rot*rotMult;
+        fr = x*RobotDirection.RIGHT.FR() + y*RobotDirection.FORWARD.FR() + rot*rotMult;
+        bl = x*RobotDirection.RIGHT.BL() + y*RobotDirection.FORWARD.BL() + rot*rotMult;
+        br = x*RobotDirection.RIGHT.BR() + y*RobotDirection.FORWARD.BR() + rot*rotMult;
 
         //TODO: calculate arm direction and speed, run to that position
         //TODO: Set servo position
@@ -169,7 +179,7 @@ public class HolonomicDriveTeleop extends OpMode{
         // get the robot's front servo and set its position to grabberPos
         // Do the same with the backServo
         robot.frontServo.setPosition(grabberPos);
-        robot.backServo.setPosition(-grabberPos);
+        robot.backServo.setPosition(1-grabberPos);
 
         // Send telemetry message to signify robot running;
         telemetry.addData("x",  "%.2f", x);
