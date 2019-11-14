@@ -90,8 +90,6 @@ public class HolonomicDriveTeleop extends OpMode{
     @Override
     public void start() {
 
-
-        //TODO: Zero the arm sensor
     }
 
     /*
@@ -162,7 +160,7 @@ public class HolonomicDriveTeleop extends OpMode{
 
         armPos += restPos*2; //scale from -1 to 1 -> 0 to 2
 
-        final double circleFraction = 0.72;
+        final double circleFraction = 0.77;
 
         armPos *= 1120*6/2 * circleFraction;
 
