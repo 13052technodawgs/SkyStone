@@ -125,8 +125,8 @@ public class HolonomicDriveTeleop extends OpMode{
             }
         }
 
-        if (gamepad2.dpad_up) robot.hookServo.setPosition(0.3);
-        if (gamepad2.dpad_down) robot.hookServo.setPosition(1);
+        if (gamepad2.dpad_up) robot.hookServo.setPosition(1);
+        if (gamepad2.dpad_down) robot.hookServo.setPosition(0.3);
 
         // Square input to smooth input values
         x*=Math.abs(x);
