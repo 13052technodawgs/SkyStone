@@ -30,6 +30,11 @@ public class GamepadExtender {
 
     public GamepadExtender(Gamepad gamepad){
         this.gamepad = gamepad;
+        a = false; b = false; x=false; y=false; start = false; back = false; guide = false;
+        leftBumper = false; rightBumper = false;
+        dPadUp = false; dPadDown = false; dPadLeft = false; dPadRight = false;
+        leftStickButton = false; rightStickButton = false;
+
     }
 
     public void update(){

@@ -29,13 +29,17 @@
 
 package org.firstinspires.ftc.teamcode.jacobrefactor;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.android.AndroidSoundPool;
 
 /**
  * This class is a wrapper for the management of all robot hardware
@@ -68,6 +72,7 @@ public class HardwareTechnoDawgs {
     public Servo frontServo = null;
     public Servo backServo = null;
     public Servo hookServo = null;
+    public CRServo dishServo = null;
 
     public DigitalChannel homeSensor = null;
     public BNO055IMU imu;
@@ -104,6 +109,7 @@ public class HardwareTechnoDawgs {
         frontServo = hwMap.get(Servo.class,"frontServo");
         backServo = hwMap.get(Servo.class,"backServo");
         hookServo = hwMap.get(Servo.class, "hookServo");
+        dishServo = hwMap.get(CRServo.class,"dishServo");
 
         homeSensor = hwMap.get(DigitalChannel.class, "homeSensor");
         imu = hwMap.get(BNO055IMU.class, "imu");

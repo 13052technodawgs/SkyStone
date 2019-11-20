@@ -29,16 +29,20 @@
 
 package org.firstinspires.ftc.teamcode.jacobrefactor;
 
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.internal.android.dex.util.ExceptionWithContext;
+
+import java.io.File;
 
 @TeleOp(name="Holonomic Drive v2", group="Technodawgs")
 public class HolonomicDriveTeleop extends OpMode{
     // CONSTANTS
     final double restPos = 5.0/6.0;
     final double armArc = 0.77;
+    final File soundFile = new File("/sdcard/Audio/WilhelmScream.wav");
 
     // INPUTS
     double movementX;
@@ -57,9 +61,11 @@ public class HolonomicDriveTeleop extends OpMode{
     double hookPos;
     boolean grabberLock = false;
 
+    double dishAngle;
+
     // FIELDS
-    GamepadExtender controller1 = new GamepadExtender(gamepad1);
-    GamepadExtender controller2 = new GamepadExtender(gamepad2);
+    GamepadExtender controller1;
+    GamepadExtender controller2;
 
     HardwareTechnoDawgs robot       = new HardwareTechnoDawgs(); // use the class created to define a Pushbot's hardware
 
@@ -72,6 +78,9 @@ public class HolonomicDriveTeleop extends OpMode{
          * The init() method of the hardware class does all the work here
          */
         robot.init(hardwareMap);
+
+        controller1 = new GamepadExtender(gamepad1);
+        controller2 = new GamepadExtender(gamepad2);
 
         // Check to make sure robot is in starting position
         if(!robot.homeSensor.getState()){
@@ -149,6 +158,9 @@ public class HolonomicDriveTeleop extends OpMode{
 
         armPos = controller2.getLeftStickY();
 
+        dishAngle = Math.atan(controller1.getLeftStickY()/controller1.getLeftStickX());
+        dishAngle /= (2*3.14158265358979323826462);
+
     }
 
     /**
@@ -167,6 +179,9 @@ public class HolonomicDriveTeleop extends OpMode{
         bl = movementX* RobotDirection.RIGHT.BL() + movementY * RobotDirection.FORWARD.BL() - movementRot;
         br = movementX* RobotDirection.RIGHT.BR() + movementY * RobotDirection.FORWARD.BR() - movementRot;
 
+        if(controller2.aPressed()){
+            SoundPlayer.getInstance().startPlaying(robot.hwMap.appContext, soundFile);
+        }
 
         //1120 ticks = 180 motor degrees
         //Gear reduction 1:6
@@ -185,6 +200,11 @@ public class HolonomicDriveTeleop extends OpMode{
 
         // Move the arm in the correct direction
         armPower = (armPos>robot.armMotor.getCurrentPosition())? -0.6: 0.6;
+
+//        if(robot.dishServo-dishAngle<0.5){
+//            // DO SOMETHING LATER
+//            //TODO: Something later
+//        }
     }
 
     /**
@@ -203,6 +223,8 @@ public class HolonomicDriveTeleop extends OpMode{
         // Do the same with the backServo
         robot.frontServo.setPosition(grabberPos);
         robot.backServo.setPosition(1-grabberPos);
+
+        robot.dishServo.setPower(1);
 
         // Send telemetry message to signify robot running;
         telemetry.addData("movementX",  "%.2f", movementX);
