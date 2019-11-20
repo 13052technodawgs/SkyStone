@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode.jacobrefactor;
 
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -72,6 +73,7 @@ public class HardwareTechnoDawgs {
     public Servo frontServo = null;
     public Servo backServo = null;
     public Servo hookServo = null;
+    public RevBlinkinLedDriver ledServo = null;
     public CRServo dishServo = null;
 
     public DigitalChannel homeSensor = null;
@@ -109,6 +111,7 @@ public class HardwareTechnoDawgs {
         frontServo = hwMap.get(Servo.class,"frontServo");
         backServo = hwMap.get(Servo.class,"backServo");
         hookServo = hwMap.get(Servo.class, "hookServo");
+        ledServo = hwMap.get(RevBlinkinLedDriver.class, "ledServo");
         dishServo = hwMap.get(CRServo.class,"dishServo");
 
         homeSensor = hwMap.get(DigitalChannel.class, "homeSensor");

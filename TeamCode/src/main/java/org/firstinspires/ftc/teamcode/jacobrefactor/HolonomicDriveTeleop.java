@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode.jacobrefactor;
 
 import com.qualcomm.ftccommon.SoundPlayer;
+import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -49,6 +50,8 @@ public class HolonomicDriveTeleop extends OpMode{
     double movementY;
     double movementRot;
 
+    int buttonPresses;
+
     // OUTPUTS
     double fl;
     double fr;
@@ -62,6 +65,7 @@ public class HolonomicDriveTeleop extends OpMode{
     boolean grabberLock = false;
 
     double dishAngle;
+    RevBlinkinLedDriver.BlinkinPattern ledPattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
 
     // FIELDS
     GamepadExtender controller1;
@@ -111,7 +115,7 @@ public class HolonomicDriveTeleop extends OpMode{
      */
     @Override
     public void start() {
-
+        buttonPresses = 0;
     }
 
     /*
@@ -205,6 +209,34 @@ public class HolonomicDriveTeleop extends OpMode{
 //            // DO SOMETHING LATER
 //            //TODO: Something later
 //        }
+
+        //TODO: Implement pattern selection
+        if(controller1.xPressed()){
+            buttonPresses++;
+            if(buttonPresses>3) buttonPresses=0;
+
+            switch(buttonPresses){
+                case 0: break;
+                case 1: break;
+                case 2: break;
+                case 3: break;
+                default: break;
+            }
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE;
+        }
+        if(controller1.bPressed()){
+            buttonPresses++;
+            if(buttonPresses>3) buttonPresses=0;
+
+            switch(buttonPresses){
+                case 0: break;
+                case 1: break;
+                case 2: break;
+                case 3: break;
+                default: break;
+            }
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
+        }
     }
 
     /**
@@ -225,6 +257,8 @@ public class HolonomicDriveTeleop extends OpMode{
         robot.backServo.setPosition(1-grabberPos);
 
         robot.dishServo.setPower(1);
+
+        robot.ledServo.setPattern(ledPattern);
 
         // Send telemetry message to signify robot running;
         telemetry.addData("movementX",  "%.2f", movementX);
