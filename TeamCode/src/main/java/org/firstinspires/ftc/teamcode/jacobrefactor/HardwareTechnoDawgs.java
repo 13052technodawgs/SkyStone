@@ -74,7 +74,7 @@ public class HardwareTechnoDawgs {
     public Servo backServo = null;
     public Servo hookServo = null;
     public RevBlinkinLedDriver ledServo = null;
-    public CRServo dishServo = null;
+    public Servo dishServo = null;
 
     public DigitalChannel homeSensor = null;
     public BNO055IMU imu;
@@ -112,7 +112,7 @@ public class HardwareTechnoDawgs {
         backServo = hwMap.get(Servo.class,"backServo");
         hookServo = hwMap.get(Servo.class, "hookServo");
         ledServo = hwMap.get(RevBlinkinLedDriver.class, "ledServo");
-        dishServo = hwMap.get(CRServo.class,"dishServo");
+        dishServo = hwMap.get(Servo.class,"dishServo");
 
         homeSensor = hwMap.get(DigitalChannel.class, "homeSensor");
         imu = hwMap.get(BNO055IMU.class, "imu");

@@ -33,10 +33,14 @@ import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.internal.android.dex.util.ExceptionWithContext;
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 @TeleOp(name="Holonomic Drive v2", group="Technodawgs")
 public class HolonomicDriveTeleop extends OpMode{
@@ -52,6 +56,11 @@ public class HolonomicDriveTeleop extends OpMode{
 
     int buttonPresses;
 
+    double moveAngle;
+
+    Deadline chargeClock = new Deadline(1000, TimeUnit.MILLISECONDS);
+    Deadline gunClock = new Deadline(1000, TimeUnit.MILLISECONDS);
+
     // OUTPUTS
     double fl;
     double fr;
@@ -61,10 +70,10 @@ public class HolonomicDriveTeleop extends OpMode{
     double armPos;
     double armPower;
     double grabberPos;
-    double hookPos;
     boolean grabberLock = false;
 
     double dishAngle;
+
     RevBlinkinLedDriver.BlinkinPattern ledPattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
 
     // FIELDS
@@ -86,14 +95,10 @@ public class HolonomicDriveTeleop extends OpMode{
         controller1 = new GamepadExtender(gamepad1);
         controller2 = new GamepadExtender(gamepad2);
 
-        // Check to make sure robot is in starting position
-        if(!robot.homeSensor.getState()){
-            telemetry.addData("Home", "True");
-        }else{
-            telemetry.addData("Home", "False");
-            throw new ExceptionWithContext("Robot is not home! Reset to start position");
-        }
-        telemetry.update();
+        robot.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        robot.armMotor.setPower(0);
+        robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
     }
 
     /*
@@ -101,12 +106,34 @@ public class HolonomicDriveTeleop extends OpMode{
      */
     @Override
     public void init_loop() {
+        controller1.update();
+
         if(!robot.homeSensor.getState()){
             telemetry.addData("Home", "True");
+            robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
         }else{
             telemetry.addData("Home", "False");
-            throw new ExceptionWithContext("Robot is not home! Reset to start position");
+            robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
         }
+
+        if(controller1.xPressed()){
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_BLUE;
+        }
+        if(controller1.bPressed()){
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED;
+        }
+
+        switch (ledPattern){
+            case HEARTBEAT_BLUE:
+                telemetry.addData("Alliance", "BLUE");
+                break;
+            case HEARTBEAT_RED:
+                telemetry.addData("Alliance", "RED");
+                break;
+            default:
+                telemetry.addData("Alliance", "NONE");
+        }
+
         telemetry.update();
     }
 
@@ -115,7 +142,23 @@ public class HolonomicDriveTeleop extends OpMode{
      */
     @Override
     public void start() {
+
+        robot.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        robot.armMotor.setPower(0);
+        robot.armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
         buttonPresses = 0;
+        // Check to make sure robot is in starting position
+        if(!robot.homeSensor.getState()){
+            telemetry.addData("Home", "True");
+        }else{
+            telemetry.addData("Home", "False");
+            throw new ExceptionWithContext("Robot is not home! Reset to start position");
+        }
+        telemetry.update();
+
+        robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
     }
 
     /*
@@ -162,8 +205,10 @@ public class HolonomicDriveTeleop extends OpMode{
 
         armPos = controller2.getLeftStickY();
 
-        dishAngle = Math.atan(controller1.getLeftStickY()/controller1.getLeftStickX());
-        dishAngle /= (2*3.14158265358979323826462);
+        moveAngle = Math.atan(movementX/movementY);
+        if(Double.isNaN(moveAngle)) moveAngle=Math.PI;
+        moveAngle = Math.toDegrees(moveAngle);
+
 
     }
 
@@ -205,38 +250,11 @@ public class HolonomicDriveTeleop extends OpMode{
         // Move the arm in the correct direction
         armPower = (armPos>robot.armMotor.getCurrentPosition())? -0.6: 0.6;
 
-//        if(robot.dishServo-dishAngle<0.5){
-//            // DO SOMETHING LATER
-//            //TODO: Something later
-//        }
+        dishAngle = (moveAngle+60)/(300-60);
 
-        //TODO: Implement pattern selection
-        if(controller1.xPressed()){
-            buttonPresses++;
-            if(buttonPresses>3) buttonPresses=0;
+        if(dishAngle<0)dishAngle=0;
+        if(dishAngle>1)dishAngle=1;
 
-            switch(buttonPresses){
-                case 0: break;
-                case 1: break;
-                case 2: break;
-                case 3: break;
-                default: break;
-            }
-            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE;
-        }
-        if(controller1.bPressed()){
-            buttonPresses++;
-            if(buttonPresses>3) buttonPresses=0;
-
-            switch(buttonPresses){
-                case 0: break;
-                case 1: break;
-                case 2: break;
-                case 3: break;
-                default: break;
-            }
-            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
-        }
     }
 
     /**
@@ -256,7 +274,7 @@ public class HolonomicDriveTeleop extends OpMode{
         robot.frontServo.setPosition(grabberPos);
         robot.backServo.setPosition(1-grabberPos);
 
-        robot.dishServo.setPower(1);
+        robot.dishServo.setPosition(dishAngle);
 
         robot.ledServo.setPattern(ledPattern);
 
