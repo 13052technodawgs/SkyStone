@@ -70,6 +70,7 @@ public class HolonomicDriveTeleop extends OpMode{
     double armPos;
     double armPower;
     double grabberPos;
+    double armHomeRatio;
     boolean grabberLock = false;
 
     double dishAngle;
@@ -210,6 +211,11 @@ public class HolonomicDriveTeleop extends OpMode{
         moveAngle = Math.toDegrees(moveAngle);
 
 
+        if(!(armHomeRatio==restPos))
+            armHomeRatio = controller2.yPressed()? restPos: 0;
+        else
+            armHomeRatio = controller2.yPressed()? 0: restPos;
+
     }
 
     /**
@@ -217,7 +223,11 @@ public class HolonomicDriveTeleop extends OpMode{
      * to find the values to output.
      */
     private void process() {
-        grabberLock = controller2.xPressed() && (controller2.getRightTrigger()>0.5);
+        if(!grabberLock)
+            grabberLock = controller2.xPressed() && (controller2.getRightTrigger()>0.5);
+        else
+            grabberLock = !controller2.xPressed();
+
         grabberPos = (controller2.getRightTrigger()>0.5 || grabberLock)? 1: 0.5;
 
         if (controller2.dUpPressed()) robot.hookServo.setPosition(1);
@@ -229,7 +239,7 @@ public class HolonomicDriveTeleop extends OpMode{
         br = movementX* RobotDirection.RIGHT.BR() + movementY * RobotDirection.FORWARD.BR() - movementRot;
 
         if(controller2.aPressed()){
-            SoundPlayer.getInstance().startPlaying(robot.hwMap.appContext, soundFile);
+//            SoundPlayer.getInstance().startPlaying(robot.hwMap.appContext, soundFile);
         }
 
         //1120 ticks = 180 motor degrees
@@ -238,12 +248,12 @@ public class HolonomicDriveTeleop extends OpMode{
 
         // Scale armPos based on restPos, so half the input is a greater fraction of the output
         if(armPos>0){
-            armPos*=2*(1-restPos);
+            armPos*=2*(1-armHomeRatio);
         }else{
-            armPos*=2*restPos;
+            armPos*=2*armHomeRatio;
         }
 
-        armPos += restPos*2; //scale from -1 to 1 -> 0 to 2
+        armPos += armHomeRatio*2; //scale from -1 to 1 -> 0 to 2
         armPos /= 2;         //scale from  0 to 2 -> 0 to 1
         armPos *= 1120*6 * armArc;
 
