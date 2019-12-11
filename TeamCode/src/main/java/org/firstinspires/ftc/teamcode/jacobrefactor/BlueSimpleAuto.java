@@ -38,8 +38,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Autonomous(name="RED SIMPLE", group="Technodawgs")
-public class StraightLineAuto extends LinearOpMode {
+@Autonomous(name="BLUE SIMPLE", group="Technodawgs")
+public class BlueSimpleAuto extends LinearOpMode {
     HardwareTechnoDawgs robot   = new HardwareTechnoDawgs();
 
     Orientation lastAngles = new Orientation();
@@ -61,7 +61,7 @@ public class StraightLineAuto extends LinearOpMode {
         {   //AUTONOMOUS MOTION SEQUENCE
             //PUT YOUR AUTO CODE HERE
 
-            moveStraight(180.0, RobotDirection.RIGHT);
+            moveStraight(180.0, RobotDirection.LEFT);
             moveStraight(1.75*360.0, RobotDirection.FORWARD);
 //            moveStraight(720.0, RobotDirection.BACKWARD);
 //            moveStraight(720.0, RobotDirection.RIGHT);

@@ -58,7 +58,7 @@ public class HolonomicDriveTeleop extends OpMode{
 
     double moveAngle;
 
-    Deadline chargeClock = new Deadline(1000, TimeUnit.MILLISECONDS);
+    Deadline chargeClock = new Deadline(90, TimeUnit.SECONDS);
     Deadline gunClock = new Deadline(1000, TimeUnit.MILLISECONDS);
 
     // OUTPUTS
@@ -118,10 +118,10 @@ public class HolonomicDriveTeleop extends OpMode{
         }
 
         if(controller1.xPressed()){
-            ledPattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_BLUE;
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE;
         }
         if(controller1.bPressed()){
-            ledPattern = RevBlinkinLedDriver.BlinkinPattern.HEARTBEAT_RED;
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
         }
 
         switch (ledPattern){
@@ -160,6 +160,8 @@ public class HolonomicDriveTeleop extends OpMode{
         telemetry.update();
 
         robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
+
+        chargeClock.reset();
     }
 
     /*
@@ -264,6 +266,12 @@ public class HolonomicDriveTeleop extends OpMode{
 
         if(dishAngle<0)dishAngle=0;
         if(dishAngle>1)dishAngle=1;
+
+        if(chargeClock.hasExpired()){
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.CONFETTI;
+
+            SoundPlayer.getInstance().startPlaying(robot.hwMap.appContext, soundFile);
+        }
 
     }
 
