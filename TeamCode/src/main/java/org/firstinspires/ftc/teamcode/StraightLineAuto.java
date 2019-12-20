@@ -49,7 +49,7 @@ public class StraightLineAuto extends LinearOpMode {
     // VARIABLES HERE
     //VARIABLES
     Orientation lastAngles = new Orientation();
-    double      globalAngle, power = .70, correction;
+    private double globalAngle, power = .70, correction;
 
 
     @Override

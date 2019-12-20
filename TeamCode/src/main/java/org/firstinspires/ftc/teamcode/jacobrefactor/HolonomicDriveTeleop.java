@@ -47,7 +47,8 @@ public class HolonomicDriveTeleop extends OpMode{
     // CONSTANTS
     final double restPos = 5.0/6.0;
     final double armArc = 0.77;
-    final File soundFile = new File("/sdcard/Audio/WilhelmScream.wav");
+    final File soundFile = new File("/sdcard/Audio/droid.wav");
+    final File klaxonFile = new File("/sdcard/Audio/klaxon.wav");
 
     // INPUTS
     double movementX;
@@ -59,7 +60,7 @@ public class HolonomicDriveTeleop extends OpMode{
     double moveAngle;
 
     Deadline chargeClock = new Deadline(90, TimeUnit.SECONDS);
-    Deadline gunClock = new Deadline(1000, TimeUnit.MILLISECONDS);
+    Deadline klaxonClock = new Deadline(6000, TimeUnit.MILLISECONDS);
 
     // OUTPUTS
     double fl;
@@ -74,6 +75,8 @@ public class HolonomicDriveTeleop extends OpMode{
     boolean grabberLock = false;
 
     double dishAngle;
+
+    boolean countdown = false;
 
     RevBlinkinLedDriver.BlinkinPattern ledPattern = RevBlinkinLedDriver.BlinkinPattern.BLACK;
 
@@ -100,6 +103,8 @@ public class HolonomicDriveTeleop extends OpMode{
         robot.armMotor.setPower(0);
         robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        klaxonClock.expire();
+
     }
 
     /*
@@ -112,9 +117,15 @@ public class HolonomicDriveTeleop extends OpMode{
         if(!robot.homeSensor.getState()){
             telemetry.addData("Home", "True");
             robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+            SoundPlayer.getInstance().stopPlayingAll();
+            klaxonClock.expire();
         }else{
             telemetry.addData("Home", "False");
             robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
+            if(klaxonClock.hasExpired()){
+                klaxonClock.reset();
+                SoundPlayer.getInstance().startPlaying(robot.hwMap.appContext, klaxonFile);
+            }
         }
 
         if(controller1.xPressed()){
@@ -125,10 +136,10 @@ public class HolonomicDriveTeleop extends OpMode{
         }
 
         switch (ledPattern){
-            case HEARTBEAT_BLUE:
+            case SHOT_BLUE:
                 telemetry.addData("Alliance", "BLUE");
                 break;
-            case HEARTBEAT_RED:
+            case SHOT_RED:
                 telemetry.addData("Alliance", "RED");
                 break;
             default:
@@ -267,10 +278,11 @@ public class HolonomicDriveTeleop extends OpMode{
         if(dishAngle<0)dishAngle=0;
         if(dishAngle>1)dishAngle=1;
 
-        if(chargeClock.hasExpired()){
+        if(chargeClock.hasExpired()&&!countdown){
             ledPattern = RevBlinkinLedDriver.BlinkinPattern.CONFETTI;
 
             SoundPlayer.getInstance().startPlaying(robot.hwMap.appContext, soundFile);
+            countdown = true;
         }
 
     }

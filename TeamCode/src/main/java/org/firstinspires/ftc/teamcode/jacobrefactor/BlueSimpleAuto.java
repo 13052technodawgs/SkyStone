@@ -43,7 +43,7 @@ public class BlueSimpleAuto extends LinearOpMode {
     HardwareTechnoDawgs robot   = new HardwareTechnoDawgs();
 
     Orientation lastAngles = new Orientation();
-    double      globalAngle, power = .70, correction;
+    double globalAngle, power = .70, correction;
 
     @Override
     public void runOpMode() {
@@ -60,7 +60,7 @@ public class BlueSimpleAuto extends LinearOpMode {
 
         {   //AUTONOMOUS MOTION SEQUENCE
             //PUT YOUR AUTO CODE HERE
-
+            //
             moveStraight(180.0, RobotDirection.LEFT);
             moveStraight(1.75*360.0, RobotDirection.FORWARD);
 //            moveStraight(720.0, RobotDirection.BACKWARD);
@@ -82,6 +82,7 @@ public class BlueSimpleAuto extends LinearOpMode {
      * @param wheelRotationInDegrees wheel rotation angle in degrees
      * @param direction the direction of movement
      */
+
     private void moveStraight(double wheelRotationInDegrees, RobotDirection direction){
 
         int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);

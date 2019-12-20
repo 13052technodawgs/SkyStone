@@ -38,12 +38,14 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Autonomous(name="ADVANCED BLUE", group="Technodawgs")
 public class avancedblueauto extends LinearOpMode {
-    HardwareTechnoDawgs robot   = new HardwareTechnoDawgs();
-
+    HardwareTechnoDawgs robot = new HardwareTechnoDawgs();
     Orientation lastAngles = new Orientation();
-    double      globalAngle, power = .70, correction;
+    private double globalAngle, power = .70, correction;
 
     @Override
     public void runOpMode() {
@@ -58,7 +60,8 @@ public class avancedblueauto extends LinearOpMode {
 
         }
 
-        {   //AUTONOMOUS MOTION SEQUENCE
+        {
+            //AUTONOMOUS MOTION SEQUENCE
             //PUT YOUR AUTO CODE HERE
 
             moveStraight(180.0, RobotDirection.LEFT);
@@ -72,8 +75,8 @@ public class avancedblueauto extends LinearOpMode {
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
-    }
 
+    }
     // METHODS
     /**
      * go in a straight line using IMU to correct for rotation
