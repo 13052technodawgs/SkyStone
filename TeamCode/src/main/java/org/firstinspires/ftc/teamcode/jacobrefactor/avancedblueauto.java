@@ -87,11 +87,13 @@ public class avancedblueauto extends LinearOpMode {
      */
     private void moveStraight(double wheelRotationInDegrees, RobotDirection direction){
 
+        resetAngle();
+
         int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
 
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontLeft.setTargetPosition(pulses);
 
-        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         while(opModeIsActive() && robot.frontLeft.isBusy()) {

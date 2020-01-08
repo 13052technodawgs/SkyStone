@@ -39,7 +39,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Autonomous(name="RED SIMPLE", group="Technodawgs")
-public class StraightLineAuto extends LinearOpMode {
+public class RedSimpleAuto extends LinearOpMode {
     HardwareTechnoDawgs robot   = new HardwareTechnoDawgs();
 
     Orientation lastAngles = new Orientation();
@@ -61,8 +61,8 @@ public class StraightLineAuto extends LinearOpMode {
         {   //AUTONOMOUS MOTION SEQUENCE
             //PUT YOUR AUTO CODE HERE
 
-            moveStraight(180.0, RobotDirection.RIGHT);
-            moveStraight(1.75*360.0, RobotDirection.FORWARD);
+            move(180.0, RobotDirection.RIGHT);
+            move(1.75*360.0, RobotDirection.FORWARD);
 //            moveStraight(720.0, RobotDirection.BACKWARD);
 //            moveStraight(720.0, RobotDirection.RIGHT);
         }
@@ -83,12 +83,13 @@ public class StraightLineAuto extends LinearOpMode {
      * @param direction the direction of movement
      */
     private void moveStraight(double wheelRotationInDegrees, RobotDirection direction){
+        resetAngle();
 
         int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
 
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontLeft.setTargetPosition(pulses);
 
-        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         while(opModeIsActive() && robot.frontLeft.isBusy()) {
@@ -98,6 +99,26 @@ public class StraightLineAuto extends LinearOpMode {
             robot.frontRight.setPower( direction.FR() * power + correction);
             robot.backLeft.setPower(   direction.BL() * power + correction);
             robot.backRight.setPower(  direction.BR() * power + correction);
+        }
+        robot.stopMotors( );
+
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    private void move(double wheelRotationInDegrees, RobotDirection direction){
+
+        int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
+
+        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        robot.frontLeft.setTargetPosition(pulses);
+
+        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while(opModeIsActive() && robot.frontLeft.isBusy()) {
+            robot.frontLeft.setPower(  direction.FL() * power);
+            robot.frontRight.setPower( direction.FR() * power);
+            robot.backLeft.setPower(   direction.BL() * power);
+            robot.backRight.setPower(  direction.BR() * power);
         }
         robot.stopMotors( );
 
