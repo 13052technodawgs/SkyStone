@@ -44,8 +44,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class StraightLineAuto extends LinearOpMode {
 
     /* Declare OpMode members. */
-    HardwareTechnoDawgs         robot   = new HardwareTechnoDawgs();   // Use a Pushbot's hardware
-    ModernRoboticsI2cGyro   gyro    = null;                    // Additional Gyro device
+    HardwareTechnoDawgs robot = new HardwareTechnoDawgs();   // Use a Pushbot's hardware
+    ModernRoboticsI2cGyro gyro = null;                    // Additional Gyro device
     // VARIABLES HERE
     //VARIABLES
     Orientation lastAngles = new Orientation();

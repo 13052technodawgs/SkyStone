@@ -38,7 +38,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Autonomous(name="BLUE SIMPLE", group="Technodawgs")
+@Autonomous(name="Blue_Corner_Plex", group="Technodawgs")
 public class BlueSimpleAuto extends LinearOpMode {
     HardwareTechnoDawgs robot   = new HardwareTechnoDawgs();
 
