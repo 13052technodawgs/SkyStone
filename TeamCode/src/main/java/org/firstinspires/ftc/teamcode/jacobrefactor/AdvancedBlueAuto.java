@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Autonomous(name="ADVANCED BLUE", group="Technodawgs")
-public class avancedblueauto extends LinearOpMode {
+public class AdvancedBlueAuto extends LinearOpMode {
     HardwareTechnoDawgs robot = new HardwareTechnoDawgs();
     Orientation lastAngles = new Orientation();
     private double globalAngle, power = .70, correction;
@@ -66,8 +66,8 @@ public class avancedblueauto extends LinearOpMode {
 
             moveStraight(180.0, RobotDirection.LEFT);
             moveStraight(1.75*360.0, RobotDirection.FORWARD);
-//            moveStraight(720.0, RobotDirection.BACKWARD);
-//            moveStraight(720.0, RobotDirection.RIGHT);
+//            moveStraight(720.0, DEPRECATEDRobotDirection.BACKWARD);
+//            moveStraight(720.0, DEPRECATEDRobotDirection.RIGHT);
         }
 
 

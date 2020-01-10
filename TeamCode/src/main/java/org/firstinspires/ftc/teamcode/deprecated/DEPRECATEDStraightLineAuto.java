@@ -27,8 +27,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.teamcode.jacobrefactor;
+package org.firstinspires.ftc.teamcode.deprecated;
 
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -38,59 +39,59 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-@Autonomous(name="Red_Corner_Wood", group="Technodawgs")
-public class RedSimpleAuto extends LinearOpMode {
-    HardwareTechnoDawgs robot   = new HardwareTechnoDawgs();
+@Autonomous(name="Pushbot: Auto Drive By Gyro", group="Pushbot")
+//@Disabled
+public class DEPRECATEDStraightLineAuto extends LinearOpMode {
 
+    /* Declare OpMode members. */
+    DEPRECATEDHardwareTechnoDawgs robot = new DEPRECATEDHardwareTechnoDawgs();   // Use a Pushbot's hardware
+    ModernRoboticsI2cGyro gyro = null;                    // Additional Gyro device
+    // VARIABLES HERE
+    //VARIABLES
     Orientation lastAngles = new Orientation();
-    double      globalAngle, power = .70, correction;
+    private double globalAngle, power = .70, correction;
+
 
     @Override
     public void runOpMode() {
 
         /*
          * Initialize the standard drive system variables.
+         * The init() method of the hardware class does most of the work here
          */
         robot.init(hardwareMap);
 
-        // Wait for the game to start
+        // Wait for the game to start (Display Gyro value), and reset gyro before we move..
         while (!isStarted()) {
 
         }
 
-        {   //AUTONOMOUS MOTION SEQUENCE
-            //PUT YOUR AUTO CODE HERE
+        moveStraight(7200.0, DEPRECATEDRobotDirection.FORWARD);
+        moveStraight(7200.0, DEPRECATEDRobotDirection.LEFT);
+        moveStraight(7200.0, DEPRECATEDRobotDirection.BACKWARD);
+        moveStraight(7200.0, DEPRECATEDRobotDirection.RIGHT);
 
-            move(180.0, RobotDirection.RIGHT);
-            move(1.75*360.0, RobotDirection.FORWARD);
-//            moveStraight(720.0, DEPRECATEDRobotDirection.BACKWARD);
-//            moveStraight(720.0, DEPRECATEDRobotDirection.RIGHT);
-        }
-
-
-       robot.stopMotors( );
+       robot.stop( );
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
     }
 
-    // METHODS
+    // METHODS HERE
+//METHODS
     /**
-     * go in a straight line using IMU to correct for rotation
+     * go forward with gyro correction
      * 2240 pulses per rotation of output shaft
      *
-     * @param wheelRotationInDegrees wheel rotation angle in degrees
-     * @param direction the direction of movement
+     * @param angle wheel rotation angle in degrees
      */
-    private void moveStraight(double wheelRotationInDegrees, RobotDirection direction){
-        resetAngle();
-
-        int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
-
+    private void moveStraight(double angle, DEPRECATEDRobotDirection direction){
         robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.frontLeft.setTargetPosition(pulses);
-
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        int pulses = direction.FL() * (int)((angle/360.0)*2240);
+
+        robot.frontLeft.setTargetPosition(pulses);
 
         while(opModeIsActive() && robot.frontLeft.isBusy()) {
             correction = checkDirection();
@@ -100,37 +101,26 @@ public class RedSimpleAuto extends LinearOpMode {
             robot.backLeft.setPower(   direction.BL() * power + correction);
             robot.backRight.setPower(  direction.BR() * power + correction);
         }
-        robot.stopMotors( );
+        robot.stop( );
 
         robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
     }
-
-    private void move(double wheelRotationInDegrees, RobotDirection direction){
-
-        int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
-
-        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.frontLeft.setTargetPosition(pulses);
-
-        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        while(opModeIsActive() && robot.frontLeft.isBusy()) {
-            robot.frontLeft.setPower(  direction.FL() * power);
-            robot.frontRight.setPower( direction.FR() * power);
-            robot.backLeft.setPower(   direction.BL() * power);
-            robot.backRight.setPower(  direction.BR() * power);
-        }
-        robot.stopMotors( );
-
-        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
     /**
      * Get current cumulative angle rotation from last reset.
      * @return Angle in degrees. + = left, - = right.
      */
     private double getAngle()
     {
+        // We experimentally determined the Z axis is the
+        // axis we want to use for heading angle.
+        // We have to process the angle because the imu works
+        // in euler angles so the Z axis is
+        // returned as 0 to +180 or 0 to -180 rolling back to
+        // -179 or +179 when rotation passes
+        // 180 degrees. We detect this transition and track the total
+        // cumulative angle of rotation.
 
         Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
                 AxesOrder.ZYX, AngleUnit.DEGREES);
@@ -149,13 +139,19 @@ public class RedSimpleAuto extends LinearOpMode {
         return globalAngle;
     }
 
+
     /**
      * See if we are moving in a straight line and if not return a
      * power correction value.
-     * @return Power adjustment, + is adjust counterclockwise - is adjust clockwise.
+     * @return Power adjustment, + is adjust left - is adjust right.
      */
     private double checkDirection()
     {
+        // The gain value determines how sensitive the correction
+        // is to direction changes.
+        // You will have to experiment with your robot to get small
+        // smooth direction changes
+        // to stay on a straight line.
         double correction, angle, gain = .10;
 
         angle = getAngle();

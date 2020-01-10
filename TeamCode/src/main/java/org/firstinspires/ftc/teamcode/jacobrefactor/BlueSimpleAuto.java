@@ -63,8 +63,8 @@ public class BlueSimpleAuto extends LinearOpMode {
             //
             move(180.0, RobotDirection.LEFT);
             move(1.75*360.0, RobotDirection.FORWARD);
-//            moveStraight(720.0, RobotDirection.BACKWARD);
-//            moveStraight(720.0, RobotDirection.RIGHT);
+//            moveStraight(720.0, DEPRECATEDRobotDirection.BACKWARD);
+//            moveStraight(720.0, DEPRECATEDRobotDirection.RIGHT);
         }
 
 

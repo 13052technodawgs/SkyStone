@@ -162,12 +162,12 @@ public class HolonomicDriveTeleop extends OpMode{
 
         buttonPresses = 0;
         // Check to make sure robot is in starting position
-        if(!robot.homeSensor.getState()){
-            telemetry.addData("Home", "True");
-        }else{
-            telemetry.addData("Home", "False");
-            throw new ExceptionWithContext("Robot is not home! Reset to start position");
-        }
+//        if(!robot.homeSensor.getState()){
+//            telemetry.addData("Home", "True");
+//        }else{
+//            telemetry.addData("Home", "False");
+//            throw new ExceptionWithContext("Robot is not home! Reset to start position");
+//        }
         telemetry.update();
 
         robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.BLACK);
