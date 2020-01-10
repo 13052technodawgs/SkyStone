@@ -48,7 +48,6 @@ public class HolonomicDriveTeleop extends OpMode{
     final double restPos = 5.0/6.0;
     final double armArc = 0.77;
     final File soundFile = new File("/sdcard/Audio/droid.wav");
-    final File klaxonFile = new File("/sdcard/Audio/klaxon.wav");
 
     // INPUTS
     double movementX;
@@ -60,7 +59,6 @@ public class HolonomicDriveTeleop extends OpMode{
     double moveAngle;
 
     Deadline chargeClock = new Deadline(90, TimeUnit.SECONDS);
-    Deadline klaxonClock = new Deadline(6000, TimeUnit.MILLISECONDS);
 
     // OUTPUTS
     double fl;
@@ -103,8 +101,6 @@ public class HolonomicDriveTeleop extends OpMode{
         robot.armMotor.setPower(0);
         robot.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        klaxonClock.expire();
-
     }
 
     /*
@@ -114,37 +110,7 @@ public class HolonomicDriveTeleop extends OpMode{
     public void init_loop() {
         controller1.update();
 
-        if(!robot.homeSensor.getState()){
-            telemetry.addData("Home", "True");
-            robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
-            SoundPlayer.getInstance().stopPlayingAll();
-            klaxonClock.expire();
-        }else{
-            telemetry.addData("Home", "False");
-            robot.ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
-            if(klaxonClock.hasExpired()){
-                klaxonClock.reset();
-                SoundPlayer.getInstance().startPlaying(robot.hwMap.appContext, klaxonFile);
-            }
-        }
-
-        if(controller1.xPressed()){
-            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE;
-        }
-        if(controller1.bPressed()){
-            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
-        }
-
-        switch (ledPattern){
-            case SHOT_BLUE:
-                telemetry.addData("Alliance", "BLUE");
-                break;
-            case SHOT_RED:
-                telemetry.addData("Alliance", "RED");
-                break;
-            default:
-                telemetry.addData("Alliance", "NONE");
-        }
+        robot.teamSet(controller1, ledPattern);
 
         telemetry.update();
     }

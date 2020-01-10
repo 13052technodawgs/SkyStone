@@ -42,8 +42,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 public class BlueSimpleAuto extends LinearOpMode {
     HardwareTechnoDawgs robot   = new HardwareTechnoDawgs();
 
-    Orientation lastAngles = new Orientation();
-    double globalAngle, power = .70, correction;
 
     @Override
     public void runOpMode() {
@@ -51,18 +49,18 @@ public class BlueSimpleAuto extends LinearOpMode {
         /*
          * Initialize the standard drive system variables.
          */
-        robot.init(hardwareMap);
+        robot.init(hardwareMap, this);
 
         // Wait for the game to start
         while (!isStarted()) {
-
+            robot.armCheck();
         }
 
         {   //AUTONOMOUS MOTION SEQUENCE
             //PUT YOUR AUTO CODE HERE
             //
-            move(180.0, RobotDirection.LEFT);
-            move(1.75*360.0, RobotDirection.FORWARD);
+            robot.move(90.0, RobotDirection.LEFT);
+            robot.move(1.75*360.0, RobotDirection.FORWARD);
 //            moveStraight(720.0, DEPRECATEDRobotDirection.BACKWARD);
 //            moveStraight(720.0, DEPRECATEDRobotDirection.RIGHT);
         }
@@ -74,111 +72,4 @@ public class BlueSimpleAuto extends LinearOpMode {
         telemetry.update();
     }
 
-    // METHODS
-    /**
-     * go in a straight line using IMU to correct for rotation
-     * 2240 pulses per rotation of output shaft
-     *
-     * @param wheelRotationInDegrees wheel rotation angle in degrees
-     * @param direction the direction of movement
-     */
-
-    private void moveStraight(double wheelRotationInDegrees, RobotDirection direction){
-        resetAngle();
-
-        int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
-
-        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.frontLeft.setTargetPosition(pulses);
-
-        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        while(opModeIsActive() && robot.frontLeft.isBusy()) {
-            correction = checkDirection();
-
-            robot.frontLeft.setPower(  direction.FL() * power + correction);
-            robot.frontRight.setPower( direction.FR() * power + correction);
-            robot.backLeft.setPower(   direction.BL() * power + correction);
-            robot.backRight.setPower(  direction.BR() * power + correction);
-        }
-        robot.stopMotors( );
-
-        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    private void move(double wheelRotationInDegrees, RobotDirection direction){
-
-        int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
-
-        robot.frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        robot.frontLeft.setTargetPosition(pulses);
-
-        robot.frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-        while(opModeIsActive() && robot.frontLeft.isBusy()) {
-            robot.frontLeft.setPower(  direction.FL() * power);
-            robot.frontRight.setPower( direction.FR() * power);
-            robot.backLeft.setPower(   direction.BL() * power);
-            robot.backRight.setPower(  direction.BR() * power);
-        }
-        robot.stopMotors( );
-
-        robot.frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    /**
-     * Get current cumulative angle rotation from last reset.
-     * @return Angle in degrees. + = left, - = right.
-     */
-    private double getAngle()
-    {
-
-        Orientation angles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
-                AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
-
-        if (deltaAngle < -180)
-            deltaAngle += 360;
-        else if (deltaAngle > 180)
-            deltaAngle -= 360;
-
-        globalAngle += deltaAngle;
-
-        lastAngles = angles;
-
-        return globalAngle;
-    }
-
-    /**
-     * See if we are moving in a straight line and if not return a
-     * power correction value.
-     * @return Power adjustment, + is adjust counterclockwise - is adjust clockwise.
-     */
-    private double checkDirection()
-    {
-        double correction, angle, gain = .10;
-
-        angle = getAngle();
-
-        if (angle == 0)
-            correction = 0;             // no adjustment.
-        else
-            correction = -angle;        // reverse sign of angle for correction.
-
-        correction = correction * gain;
-
-        return correction;
-    }
-
-    /**
-     * Resets the cumulative angle tracking to zero.
-     */
-    private void resetAngle()
-    {
-        lastAngles = robot.imu.getAngularOrientation(AxesReference.INTRINSIC,
-                AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        globalAngle = 0;
-    }
 }

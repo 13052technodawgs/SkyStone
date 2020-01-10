@@ -32,7 +32,7 @@ package org.firstinspires.ftc.teamcode.jacobrefactor;
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.rev.RevBlinkinLedDriver;
-import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -40,7 +40,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.android.AndroidSoundPool;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.internal.system.Deadline;
+
+import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is a wrapper for the management of all robot hardware
@@ -83,11 +90,25 @@ public class HardwareTechnoDawgs {
 
 
     HardwareMap hwMap = null;
+    private LinearOpMode thisOpMode = null;
     private ElapsedTime period = new ElapsedTime();
+
+    Orientation lastAngles = new Orientation();
+    double globalAngle, power = .70, correction;
+
+
+    Deadline klaxonClock = new Deadline(6000, TimeUnit.MILLISECONDS);
+    final File klaxonFile = new File("/sdcard/Audio/klaxon.wav");
+
 
     /* Constructor */
     public HardwareTechnoDawgs() {
 
+    }
+
+    public void init(HardwareMap hwMap, LinearOpMode thisOpMode){
+        init(hwMap);
+        this.thisOpMode = thisOpMode;
     }
 
     /**
@@ -156,6 +177,141 @@ public class HardwareTechnoDawgs {
         backLeft.setPower(0);
         backRight.setPower(0);
         armMotor.setPower(0);
+    }
+
+
+    @Deprecated
+    public void moveStraight(double wheelRotationInDegrees, RobotDirection direction){
+        resetAngle();
+
+        int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
+
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setTargetPosition(pulses);
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while(thisOpMode.opModeIsActive() && frontLeft.isBusy()) {
+            correction = checkDirection();
+
+            frontLeft.setPower(  direction.FL() * power + correction);
+            frontRight.setPower( direction.FR() * power + correction);
+            backLeft.setPower(   direction.BL() * power + correction);
+            backRight.setPower(  direction.BR() * power + correction);
+        }
+        stopMotors( );
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void move(double wheelRotationInDegrees, RobotDirection direction){
+
+        int pulses = direction.FL() * (int)((wheelRotationInDegrees/360.0)*2240);
+
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontLeft.setTargetPosition(pulses);
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        while(thisOpMode.opModeIsActive() && frontLeft.isBusy()) {
+            frontLeft.setPower(  direction.FL() * power);
+            frontRight.setPower( direction.FR() * power);
+            backLeft.setPower(   direction.BL() * power);
+            backRight.setPower(  direction.BR() * power);
+        }
+        stopMotors( );
+
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    /**
+     * Get current cumulative angle rotation from last reset.
+     * @return Angle in degrees. + = left, - = right.
+     */
+    private double getAngle()
+    {
+
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC,
+                AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
+
+        if (deltaAngle < -180)
+            deltaAngle += 360;
+        else if (deltaAngle > 180)
+            deltaAngle -= 360;
+
+        globalAngle += deltaAngle;
+
+        lastAngles = angles;
+
+        return globalAngle;
+    }
+
+    /**
+     * See if we are moving in a straight line and if not return a
+     * power correction value.
+     * @return Power adjustment, + is adjust counterclockwise - is adjust clockwise.
+     */
+    private double checkDirection()
+    {
+        double correction, angle, gain = .10;
+
+        angle = getAngle();
+
+        if (angle == 0)
+            correction = 0;             // no adjustment.
+        else
+            correction = -angle;        // reverse sign of angle for correction.
+
+        correction = correction * gain;
+
+        return correction;
+    }
+
+    /**
+     * Resets the cumulative angle tracking to zero.
+     */
+    private void resetAngle()
+    {
+        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC,
+                AxesOrder.ZYX, AngleUnit.DEGREES);
+
+        globalAngle = 0;
+    }
+
+    public void armCheck(){
+        if(!homeSensor.getState()){
+            ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.GREEN);
+            SoundPlayer.getInstance().stopPlayingAll();
+            klaxonClock.expire();
+        }else{
+            ledServo.setPattern(RevBlinkinLedDriver.BlinkinPattern.STROBE_GOLD);
+            if(klaxonClock.hasExpired()){
+                klaxonClock.reset();
+                SoundPlayer.getInstance().startPlaying(hwMap.appContext, klaxonFile);
+            }
+        }
+    }
+
+    public void teamSet(GamepadExtender controller1, RevBlinkinLedDriver.BlinkinPattern ledPattern){
+        if(controller1.xPressed()){
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_BLUE;
+        }
+        if(controller1.bPressed()){
+            ledPattern = RevBlinkinLedDriver.BlinkinPattern.SHOT_RED;
+        }
+
+        switch (ledPattern){
+            case SHOT_BLUE:
+                thisOpMode.telemetry.addData("Alliance", "BLUE");
+                break;
+            case SHOT_RED:
+                thisOpMode.telemetry.addData("Alliance", "RED");
+                break;
+            default:
+                thisOpMode.telemetry.addData("Alliance", "NONE");
+        }
     }
 }
 
